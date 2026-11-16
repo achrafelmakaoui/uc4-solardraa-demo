@@ -1,5 +1,5 @@
 """
-UC4 SolarDrâa — Group 9 (Achraf El Makaoui & Anas Rwchi) — Streamlit demo.
+UC4 SolarDrâa - Group 9 (Achraf El Makaoui & Anas Rwchi) - Streamlit demo.
 
 Loads the REAL saved models from outputs/models/ and the REAL data from data_UC4/,
 and recomputes everything live (no retraining, no hard-coded results).
@@ -39,7 +39,7 @@ def trouver_racine():
 RACINE = trouver_racine()
 
 # =============================================================================
-# 1. Constants and data preparation — copied from uc4_demarrage_reconstruit.ipynb
+# 1. Constants and data preparation - copied from uc4_demarrage_reconstruit.ipynb
 #    (same functions, same hypotheses H1–H10, so the models get exactly their inputs)
 # =============================================================================
 H = 6
@@ -314,8 +314,8 @@ def gain_par_horizon(E, P, masque, cap):
 # =============================================================================
 # 3. Page layout
 # =============================================================================
-st.set_page_config(page_title="UC4 SolarDrâa — Group 9", page_icon="☀️", layout="wide")
-st.title("☀️ UC4 SolarDrâa — forecasting demo")
+st.set_page_config(page_title="UC4 SolarDrâa - Group 9", page_icon="☀️", layout="wide")
+st.title("☀️ UC4 SolarDrâa - forecasting demo")
 st.caption("Group 9 · Achraf El Makaoui & Anas Rwchi · M2 SDIA, ENSET Mohammedia · all models are the saved "
            "models from our notebooks, run live on the test data (simulated data).")
 
@@ -333,7 +333,7 @@ PRED = calculer_predictions(str(RACINE))
 page = st.sidebar.radio("Page", ["1 · Forecast explorer", "2 · Sky camera", "3 · Panel inspection",
                                  "4 · Test results (all models)"])
 st.sidebar.markdown("---")
-st.sidebar.markdown("**Metric** — gain = 1 − RMSE(model) / RMSE(smart persistence), daylight hours only.\n\n"
+st.sidebar.markdown("**Metric** - gain = 1 − RMSE(model) / RMSE(smart persistence), daylight hours only.\n\n"
                     "0 = as good as the reference · 0.30 = 30 % less error · < 0 = worse.")
 ECRETER = st.sidebar.checkbox("Clip forecasts to [0, capacity] (deployment)", value=False,
                               help="Off = raw model outputs, exactly as evaluated in the notebooks. "
@@ -346,10 +346,10 @@ COULEURS = {"Smart persistence": "#5b8db8"}
 
 
 # -----------------------------------------------------------------------------
-# Page 1 — Forecast explorer
+# Page 1 - Forecast explorer
 # -----------------------------------------------------------------------------
 if page.startswith("1"):
-    st.header("Forecast explorer — test period")
+    st.header("Forecast explorer - test period")
     c1, c2, c3 = st.columns([1, 1, 1])
     site = c1.radio("Site", ["A", "B"], horizontal=True,
                     format_func=lambda s: "A · Ouarzazate 50 MW" if s == "A" else "B · Atlantic coast 20 MW")
@@ -389,7 +389,7 @@ if page.startswith("1"):
                 r = np.sqrt(np.mean((y - PRED[site][n][m_jour, h - 1][J]) ** 2)) * cap
                 lignes.append({"model": n, "RMSE this day (MW)": round(r, 2),
                                "gain this day": round(1 - r / r_sp, 3) if r_sp > 0 else np.nan})
-            st.caption("Daylight hours of this day only (one day is noisy — the test-set numbers are on page 4).")
+            st.caption("Daylight hours of this day only (one day is noisy - the test-set numbers are on page 4).")
             st.dataframe(pd.DataFrame(lignes).set_index("model"))
 
     # ---- Chart 2: one forecast origin, the 6 horizons ----
@@ -413,10 +413,10 @@ if page.startswith("1"):
 
 
 # -----------------------------------------------------------------------------
-# Page 2 — Sky camera
+# Page 2 - Sky camera
 # -----------------------------------------------------------------------------
 elif page.startswith("2"):
-    st.header("Sky camera — cloud cover and sun occlusion")
+    st.header("Sky camera - cloud cover and sun occlusion")
     site = st.radio("Site", ["A", "B"], horizontal=True)
     C, Pc = CIEL[site], PRED["ciel"][site]
     te_img = Pc["split"][2]
@@ -479,16 +479,16 @@ elif page.startswith("2"):
 
 
 # -----------------------------------------------------------------------------
-# Page 3 — Panel inspection
+# Page 3 - Panel inspection
 # -----------------------------------------------------------------------------
 elif page.startswith("3"):
-    st.header("Panel inspection — thermal auto-encoder")
+    st.header("Panel inspection - thermal auto-encoder")
     if not PRED["thermo"]:
         st.error("Auto-encoder model missing.")
         st.stop()
     R = PRED["thermo"]
     lab = THERMO["defaut_test"]
-    NOMS_T = {0: "healthy", 1: "type 1", 2: "type 2 (cracked cells — our hypothesis)", 3: "type 3", 4: "type 4"}
+    NOMS_T = {0: "healthy", 1: "type 1", 2: "type 2 (cracked cells - our hypothesis)", 3: "type 3", 4: "type 4"}
     c1, c2 = st.columns([1, 1])
     filtre = c1.selectbox("Show modules", ["any", 0, 1, 2, 3, 4], index=3,
                           format_func=lambda k: "any" if k == "any" else NOMS_T[k])
@@ -530,10 +530,10 @@ elif page.startswith("3"):
 
 
 # -----------------------------------------------------------------------------
-# Page 4 — Test results
+# Page 4 - Test results
 # -----------------------------------------------------------------------------
 else:
-    st.header("Test results — recomputed live from the saved models")
+    st.header("Test results - recomputed live from the saved models")
     for site, titre, cible in [("A", "Site A · test 2025", 0.30), ("B", "Site B · test April–June 2025", 0.27)]:
         E, cap = EX[site], CAPACITE[site]
         lignes = {n: gain_par_horizon(E, P, E["te"], cap) for n, P in PRED[site].items()}
@@ -544,7 +544,7 @@ else:
                                                             subset=list(df.columns)))
         st.caption(f"Targets: gain at 1 h ≥ 0.12 (site A), mean gain ≥ {cible:.2f}. "
                    + ("Forecasts clipped to [0, capacity] (deployment)." if ECRETER
-                      else "Raw model outputs — same numbers as the notebooks."))
+                      else "Raw model outputs - same numbers as the notebooks."))
         fig, ax = plt.subplots(figsize=(9, 2.8))
         for n in df.index:
             if n != "Smart persistence":
